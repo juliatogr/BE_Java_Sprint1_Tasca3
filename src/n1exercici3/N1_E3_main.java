@@ -1,9 +1,13 @@
 package n1exercici3;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +45,7 @@ public class N1_E3_main {
 	        while (reader.hasNextLine()) {		
 	          String data = reader.nextLine();
 	          String dataArray[] = data.split(" ");		// Separem país i capital
-	          countries.put(dataArray[0], dataArray[1]);// i les guardem al HashMap
+	          countries.put(dataArray[0].replace('_', ' '), dataArray[1].replace('_', ' '));// i les guardem al HashMap
 	        }
 	        reader.close();
 	    } catch (FileNotFoundException e) {
@@ -57,8 +61,9 @@ public class N1_E3_main {
 		String nomFitxer = "classificacio.txt";
 		
 		try {
-	        FileWriter classificacioFile = new FileWriter(nomFitxer);
-	        classificacioFile.write("Jugador/a " + name + ": " + points + " punts");
+	        Writer classificacioFile = new BufferedWriter(new OutputStreamWriter(
+	                new FileOutputStream(nomFitxer, true), "UTF-8"));
+	        classificacioFile.write("Jugador/a " + name + ": " + points + " punts\n");
 	        classificacioFile.close();
 	        System.out.println("La classificació s'ha guardat en el fitxer " + nomFitxer);
 	    } catch (IOException e) {
@@ -85,9 +90,20 @@ public class N1_E3_main {
 	    Random r = new Random(); 
 	    
 	    // Joc
-	    for (int i=0; i<NUM_INTENTS; i++) {
+	    
+	    int i = 0;
+	    
+	    ArrayList<Integer> randomNums = new ArrayList<Integer>();
+	    while (i<NUM_INTENTS) {
 	    	// busquem el país a partir del número aleatori i la capital corresponent
-	    	String pais = keysAsArray.get(r.nextInt(countries.size()));
+	    	int idxCountry = r.nextInt(countries.size());
+	    	
+	    	while (randomNums.contains(idxCountry)) {
+	    		idxCountry = r.nextInt(countries.size());
+	    	}
+	    	
+	    	randomNums.add(idxCountry);
+	    	String pais = keysAsArray.get(idxCountry);
 	    	String capital = countries.get(pais);
 	    	
 	    	// A l'usuari només li mostrem el país i agafem la capital que introdueix
@@ -102,6 +118,7 @@ public class N1_E3_main {
 		    	System.out.println("T'has equivocat");
 		    }
 		    System.out.println("Punts totals: " + points);
+		    i++;
 	    }
 	    return points;
 	}
